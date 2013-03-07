@@ -131,11 +131,12 @@ class SearchBackend(BaseSearchBackend):
         if not hasattr(settings, 'HAYSTACK_XAPIAN_PATH'):
             raise ImproperlyConfigured('You must specify a HAYSTACK_XAPIAN_PATH in your settings.')
         
-        if not os.path.exists(settings.HAYSTACK_XAPIAN_PATH):
-            os.makedirs(settings.HAYSTACK_XAPIAN_PATH)
-        
-        if not os.access(settings.HAYSTACK_XAPIAN_PATH, os.W_OK):
-            raise IOError("The path to your Xapian index '%s' is not writable for the current user/group." % settings.HAYSTACK_XAPIAN_PATH)
+        if isinstance(settings.HAYSTACK_XAPIAN_PATH, basestring):
+            if not os.path.exists(settings.HAYSTACK_XAPIAN_PATH):
+                os.makedirs(settings.HAYSTACK_XAPIAN_PATH)
+            
+            if not os.access(settings.HAYSTACK_XAPIAN_PATH, os.W_OK):
+                raise IOError("The path to your Xapian index '%s' is not writable for the current user/group." % settings.HAYSTACK_XAPIAN_PATH)
         
         self.language = language
         self._schema = None
@@ -790,13 +791,29 @@ class SearchBackend(BaseSearchBackend):
 
         Returns an instance of a xapian.Database or xapian.WritableDatabase
         """
-        if writable:
-            database = xapian.WritableDatabase(settings.HAYSTACK_XAPIAN_PATH, xapian.DB_CREATE_OR_OPEN)
+        if isinstance(settings.HAYSTACK_XAPIAN_PATH, basestring):
+            if writable:
+                database = xapian.WritableDatabase(settings.HAYSTACK_XAPIAN_PATH, xapian.DB_CREATE_OR_OPEN)
+            else:
+                try:
+                    database = xapian.Database(settings.HAYSTACK_XAPIAN_PATH)
+                except xapian.DatabaseOpeningError:
+                    raise InvalidIndexError(u'Unable to open index at %s' % settings.HAYSTACK_XAPIAN_PATH)
         else:
             try:
-                database = xapian.Database(settings.HAYSTACK_XAPIAN_PATH)
-            except xapian.DatabaseOpeningError:
+                host, port = settings.HAYSTACK_XAPIAN_PATH
+            except ValueError:
                 raise InvalidIndexError(u'Unable to open index at %s' % settings.HAYSTACK_XAPIAN_PATH)
+
+            if writable:
+                database = xapian.remote_open_writeable(host, port)
+                database = xapian.WritableDatabase(database)
+            else:
+                try:
+                    database = xapian.remote_open(host, port)
+                    database = xapian.Database(database)
+                except xapian.DatabaseOpeningError:
+                    raise InvalidIndexError(u'Unable to open index at %s' % settings.HAYSTACK_XAPIAN_PATH)
 
         return database
 

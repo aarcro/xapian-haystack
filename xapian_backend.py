@@ -806,7 +806,7 @@ class SearchBackend(BaseSearchBackend):
                 raise InvalidIndexError(u'Unable to open index at %s' % settings.HAYSTACK_XAPIAN_PATH)
 
             if writable:
-                database = xapian.remote_open_writeable(host, port)
+                database = xapian.remote_open_writable(host, port)
                 database = xapian.WritableDatabase(database)
             else:
                 try:

@@ -135,8 +135,9 @@ class SearchBackend(BaseSearchBackend):
             if not os.path.exists(settings.HAYSTACK_XAPIAN_PATH):
                 os.makedirs(settings.HAYSTACK_XAPIAN_PATH)
             
-            if not os.access(settings.HAYSTACK_XAPIAN_PATH, os.W_OK):
-                raise IOError("The path to your Xapian index '%s' is not writable for the current user/group." % settings.HAYSTACK_XAPIAN_PATH)
+            # Do not check this here
+            #if not os.access(settings.HAYSTACK_XAPIAN_PATH, os.W_OK):
+            #    raise IOError("The path to your Xapian index '%s' is not writable for the current user/group." % settings.HAYSTACK_XAPIAN_PATH)
         
         self.language = language
         self._schema = None

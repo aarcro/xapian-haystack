@@ -22,3 +22,10 @@ Thanks to:
     * Adam Endicott for the initial patch that corrected an oversight with stemming not always being done during a search.
     * Sym Roe for a patch that improved performance in "more-like-this" and suggestion the removal of FLAG_PARTIAL.
     * liranz for pointing out a potential conflict with arguments pass into `SearchResult`
+    * Jacob Kaplan-Moss for pointing out that write permission shouldn't be required for searching.
+    * glassresistor for assistance troubleshooting an issue with boosting a phrase query & a patch to make weighting schemes overridable.
+    * James Addison for helping to debug an intermittent issue with `order_by` and `build_schema`.
+    * Michael Opitz for a patch that enables support for `inmemorydb`.
+    * Evgeniy Kirov for a patch that adds `HAYSTACK_XAPIAN_LANGUAGE` used for setting the stemming language.
+    * domasx2 for a patch that explicitly closes the database when not in use.
+    * naktinis for a patch that fixed changes the behaviour of the `narrow_queries` argument of `search` so that queries are ANDed together rather than ORed.

@@ -13,9 +13,8 @@ Requirements
 
 - Python 2.4 (May work with 2.3, but untested)
 - Django 1.0.x
-- Django-Haystack 1.1.X (If you wish to use django-haystack 1.0.X, please use xapian-haystack 1.0.X)
+- Django-Haystack 2.0.X
 - Xapian 1.0.13+ (May work with earlier versions, but untested)
-- mod_wsgi 1.3.X
 
 Notes
 -----
@@ -34,13 +33,30 @@ Installation
     or
 
     ``pip install xapian-haystack``
-    
+
     or
 
     ``easy_install xapian-haystack``
 
-#. Add ``HAYSTACK_XAPIAN_PATH`` to ``settings.py``
-#. Set ``HAYSTACK_SEARCH_ENGINE`` to ``xapian``
+#. Set to something similar to:
+
+    HAYSTACK_CONNECTIONS = {
+        'default': {
+            'ENGINE': 'haystack.backends.xapian_backend.XapianEngine',
+            'PATH': os.path.join(os.path.dirname(__file__), 'xapian_index')
+        },
+    }
+
+Configuration
+-------------
+
+As well as the flags described `here <http://docs.haystacksearch.org/dev/settings.html>`_, the xapian backend includes two additional variables:
+
+    - `HAYSTACK_XAPIAN_FLAGS` -- used to further configure how indexes are stored and manipulated.  By default, this value is set to `FLAG_PHRASE | FLAG_BOOLEAN | FLAG_LOVEHATE | FLAG_WILDCARD | FLAG_PURE_NOT`.  See the `Xapian::QueryParser::feature_flag in the Xapian documentation <http://xapian.org/docs/apidoc/html/classXapian_1_1QueryParser.html>`_ for further explanation of the available Xapian.QueryParser flags.
+
+    - `HAYSTACK_XAPIAN_WEIGHTING_SCHEME` -- used to override the default weighting scheme used during search.  `HAYSTACK_XAPIAN_WEIGHTING_SCHEME` is assumed to be a tuple that corepsonds to the arguments to a BM25Weight constructor.  See `Xapian::BM25Weight::BM25Weight in the Xapian documentation <http://xapian.org/docs/apidoc/html/classXapian_1_1BM25Weight.html>`_ for further information.
+
+    - `HAYSTACK_XAPIAN_LANGUAGE` -- used to override the default stemming language.  By default, Xapian will stem all terms in english.
 
 Testing
 -------
@@ -83,12 +99,12 @@ The latest source code can always be found here: `github.com/notanumber/xapian-h
 Credits
 -------
 
-xapian-haystack is maintained by `David Sauve <mailto:dsauve@trapeze.com>`_, and is funded by `Trapeze <http://www.trapeze.com>`_.
+xapian-haystack is maintained by `David Sauve <mailto:david.sauve@bag-of-holding.com>`_, and was originally funded by `Trapeze <http://www.trapeze.com>`_.
 
 License
 -------
 
-xapian-haystack is Copyright (c) 2009-2010 David Sauve, Trapeze. It is free software, and may be redistributed under the terms specified in the LICENSE file. 
+xapian-haystack is Copyright (c) 2009, 2010, 2011, 2012 David Sauve, 2009, 2010 Trapeze. It is free software, and may be redistributed under the terms specified in the LICENSE file.
 
 Questions, Comments, Concerns:
 ------------------------------
